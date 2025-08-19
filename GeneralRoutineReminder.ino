@@ -71,9 +71,8 @@ void setup() {
   lcd.backlight();
 
   syncTime();
+  pinInit();
 
-  pinMode(buttonPin, INPUT);
-  pinMode(ringPin, OUTPUT);
 }
 
 void loop() {
@@ -226,4 +225,10 @@ void toggleLed() {
 
   ledState = !ledState; 
   digitalWrite(led, ledState ? HIGH : LOW);
+}
+
+void pinInit(){
+  pinMode(buttonPin, INPUT);
+  pinMode(ringPin, OUTPUT);
+  pinMode(led, OUTPUT);
 }
