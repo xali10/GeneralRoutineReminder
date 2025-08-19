@@ -65,10 +65,7 @@ void setup() {
     continue;
 
   SPIFFS.begin();
-  // loadConfiguration(configFile, config);
   loadTasks(tasksFile, tasks);
-
-  // connectToWiFi(config.ssid, config.password);
 
   lcd.init();
   lcd.backlight();
