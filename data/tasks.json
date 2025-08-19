@@ -1,23 +1,94 @@
 [
   {
+    "name": "Wake up",
+    "time" : {
+    	"hour" : 3,
+    	"minute" : 0
+    }
+  },  
+  {
+    "name": "Nap",
+    "time" : {
+    	"hour" : 11,
+    	"minute" : 0
+    }
+  },  
+  {
+    "name": "Prayers 1",
+    "time" : {
+    	"hour" : 5,
+    	"minute" : 0
+    }
+  },
+  {
+    "name": "Prayers 2",
+    "time" : {
+    	"hour" : 17,
+    	"minute" : 0
+    }
+  }
+  ,
+  {
+    "name": "Work Session 1",
+    "time" : {
+    	"hour" : 6,
+    	"minute" : 0
+    }
+  },
+  {
+    "name": "Work Session 2",
+    "time" : {
+    	"hour" : 7,
+    	"minute" : 0
+    }
+  },
+  {
+    "name": "Work Session 3",
+    "time" : {
+    	"hour" : 8,
+    	"minute" : 0
+    }
+  },
+  {
+    "name": "Work Session 4",
+    "time" : {
+    	"hour" : 9,
+    	"minute" : 0
+    }
+  },
+  {
+    "name": "Work Session 5",
+    "time" : {
+    	"hour" : 13,
+    	"minute" : 0
+    }
+  },
+  {
+    "name": "Work Session 6",
+    "time" : {
+    	"hour" : 14,
+    	"minute" : 0
+    }
+  },
+  {
     "name": "Task 1",
     "time" : {
-    	"hour" : 9,
-    	"minute" : 33
+    	"hour" : 23,
+    	"minute" :27
     }
-  },  
+  },
   {
-    "name": "Ahmed Movie",
+    "name": "Task 2",
     "time" : {
-    	"hour" : 9,
-    	"minute" : 55
+    	"hour" : 23,
+    	"minute" : 28
     }
-  },  
+  },
   {
-    "name": "Task3",
+    "name": "Task 3",
     "time" : {
-    	"hour" : 10,
-    	"minute" : 15
+    	"hour" : 23,
+    	"minute" : 30
     }
   }
 ]

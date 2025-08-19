@@ -4,6 +4,7 @@
 #include <time.h>
 #include <LiquidCrystal_I2C.h>
 
+#define TASKS_CAP 20
 
 
 struct Config {
@@ -28,8 +29,8 @@ Config config;
 
 // Tasks
 const char* tasksFile = "/tasks.json";
-Task tasks[10];
-bool tasksFired[10] = {0};
+Task tasks[TASKS_CAP];
+bool tasksFired[TASKS_CAP] = {0};
 
 // Time
 const char* timezone = "EET-2EEST,M4.5.5/0,M10.5.4/24";
@@ -39,6 +40,11 @@ const unsigned long ntpSyncInterval = 30 * 60 * 1000; // Sync every 30 minutes (
 // LCD
 LiquidCrystal_I2C lcd(0x27,16,2);
 
+const int buttonPin = 4;  // the number of the pushbutton pin
+const int ringPin =  5;    // the number of the puzzer pin
+bool backlightOn = true;
+bool backlightChanged = false;
+bool alarmFired = false;
 
 void setup() {
   
@@ -56,6 +62,9 @@ void setup() {
   lcd.backlight();
 
   syncTime();
+
+  pinMode(buttonPin, INPUT);
+  pinMode(ringPin, OUTPUT);
 }
 
 void loop() {
@@ -75,12 +84,28 @@ void loop() {
   if (taskIndex != -1) {
 
     Serial.println("It's Time To Do Your Job: " + String(tasks[taskIndex].name));
-    
+
+    lcd.backlight();
     lcd.clear();
     lcd.setCursor(0,0);
     lcd.print("Task:");
     lcd.setCursor(0,1);
     lcd.print(String(tasks[taskIndex].name));
+
+    digitalWrite(ringPin, HIGH);
+
+    alarmFired = true;
+  }
+
+  if (alarmFired) {
+
+    if (digitalRead(buttonPin) == HIGH) {
+      
+      digitalWrite(ringPin, LOW);
+      lcd.noBacklight();
+    
+      alarmFired = false;
+    }
   }
 
   delay(1000);
@@ -163,7 +188,7 @@ void printCurrentTime(struct tm *_timeinfo) {
 
 int checkTimeForTask(struct tm *_timeinfo) {
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < TASKS_CAP; i++) {
 
     Task task = tasks[i];
     Time time = tasks[i].time;
