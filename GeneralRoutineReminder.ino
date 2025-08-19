@@ -55,10 +55,10 @@ const int buttonPin = 4;    // the number of the pushbutton pin
 const int puzzerPin =  5;   // the number of the puzzer pin
 
 // Flags
-bool backlightOn = true;
-bool backlightChanged = false;
-bool alarmFired = false;
-bool ledState = false;
+bool backlightOn = true; // Backlight state
+bool backlightChanged = false; // Backlight state changed
+bool alarmFired = false;  // Alarm state
+bool ledState = false;  // LED state
 
 
 void setup() {
