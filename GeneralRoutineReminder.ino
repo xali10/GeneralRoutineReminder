@@ -41,7 +41,7 @@ Task tasks[TASKS_CAP];
 bool tasksFired[TASKS_CAP] = {0};
 
 // Time
-const char* timezone = "EET-2EEST,M4.5.5/0,M10.5.4/24";
+const char* timezone = "EET-2EEST,M4.5.5/0,M10.5.4/24"; // Eastern Egypt Time
 unsigned long lastNTPUpdate = 0; // Timestamp for the last NTP sync
 const unsigned long ntpSyncInterval = 30 * 60 * 1000; // Sync every 30 minutes (in ms)
 unsigned long lastLcdUpdate = 0;   // Timestamp for the last LCD update
@@ -50,9 +50,9 @@ const unsigned long lcdInterval = 1000; // Update every second (in ms)
 LiquidCrystal_I2C lcd(0x27,16,2);
 
 // Pins
-const int ledPin = 2 ; // the number of the LED pin
-const int buttonPin = 4;  // the number of the pushbutton pin
-const int puzzerPin =  5;    // the number of the puzzer pin
+const int ledPin = 2 ;      // the number of the LED pin
+const int buttonPin = 4;    // the number of the pushbutton pin
+const int puzzerPin =  5;   // the number of the puzzer pin
 
 // Flags
 bool backlightOn = true;
@@ -64,7 +64,9 @@ bool ledState = false;
 void setup() {
   
   Serial.begin(115200);
-    connectToWiFi();
+  connectToWiFi();
+  server.on("/tasks", handleReceiveTasks);
+  server.begin();
 
   while (!Serial)
     continue;
@@ -72,8 +74,6 @@ void setup() {
   SPIFFS.begin();
   loadTasks(tasksFile, tasks);
 
-  server.on("/tasks", handleReceiveTasks);
-  server.begin();
 
   lcd.init();
   lcd.backlight();
@@ -84,10 +84,11 @@ void setup() {
 }
 
 void loop() {
+
     server.handleClient();
 
-      for (int i = 0; i < 100; i++) {
-    handleLcd();  
+    for (int i = 0; i < 100; i++) {
+    handleTaskJob();  
   }
 
 }
@@ -137,8 +138,13 @@ void getCurrentTime(struct tm *_timeinfo) {
 void printCurrentTime(struct tm *_timeinfo) {
 
   Serial.printf("Current time: %02d:%02d:%02d, Date: %04d-%02d-%02d\n",
-              _timeinfo->tm_hour, _timeinfo->tm_min, _timeinfo->tm_sec,
-              _timeinfo->tm_year + 1900, _timeinfo->tm_mon + 1, _timeinfo->tm_mday);
+     _timeinfo->tm_hour,
+     _timeinfo->tm_min,
+     _timeinfo->tm_sec,
+     _timeinfo->tm_year + 1900,
+     _timeinfo->tm_mon + 1,
+     _timeinfo->tm_mday
+     );
 
 }
 
@@ -241,9 +247,8 @@ void handleReceiveTasks() {
   }
 }
 
-void handleLcd() {
+void handleTaskJob() {
   unsigned long now = millis();
-
   if (now - lastLcdUpdate < lcdInterval) {
     return; 
   }
@@ -251,6 +256,7 @@ void handleLcd() {
 
   struct tm timeinfo;
   getCurrentTime(&timeinfo);
+  printCurrentTime(&timeinfo);
 
   // Resynchronize with NTP every 30 minutes
   if (now - lastNTPUpdate > ntpSyncInterval) {
