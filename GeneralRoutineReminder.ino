@@ -44,7 +44,8 @@ bool tasksFired[TASKS_CAP] = {0};
 const char* timezone = "EET-2EEST,M4.5.5/0,M10.5.4/24";
 unsigned long lastNTPUpdate = 0; // Timestamp for the last NTP sync
 const unsigned long ntpSyncInterval = 30 * 60 * 1000; // Sync every 30 minutes (in ms)
-
+unsigned long lastLcdUpdate = 0;   // Timestamp for the last LCD update
+const unsigned long lcdInterval = 1000; // Update every second (in ms)
 // LCD
 LiquidCrystal_I2C lcd(0x27,16,2);
 
@@ -196,13 +197,13 @@ void toggleLed() {
   Serial.println(ledState);
 
   ledState = !ledState; 
-  digitalWrite(led, ledState ? HIGH : LOW);
+  digitalWrite(ledPin, ledState ? HIGH : LOW);
 }
 
 void pinInit(){
   pinMode(buttonPin, INPUT);
   pinMode(puzzerPin, OUTPUT);
-  pinMode(led, OUTPUT);
+  pinMode(ledPin, OUTPUT);
 }
 void handleReceiveTasks() {
 
@@ -240,45 +241,44 @@ void handleReceiveTasks() {
   }
 }
 
-void handleLcd(){
+void handleLcd() {
+  unsigned long now = millis();
+
+  if (now - lastLcdUpdate < lcdInterval) {
+    return; 
+  }
+  lastLcdUpdate = now;
+
   struct tm timeinfo;
   getCurrentTime(&timeinfo);
-  
-  // printCurrentTime(&timeinfo);
 
   // Resynchronize with NTP every 30 minutes
-  if (millis() - lastNTPUpdate > ntpSyncInterval) {
+  if (now - lastNTPUpdate > ntpSyncInterval) {
     syncTime();
   }
 
   int taskIndex = checkTimeForTask(&timeinfo);
 
   if (taskIndex != -1) {
-
     Serial.println("It's Time To Do Your Job: " + String(tasks[taskIndex].name));
 
     lcd.backlight();
     lcd.clear();
-    lcd.setCursor(0,0);
+    lcd.setCursor(0, 0);
     lcd.print("Task:");
-    lcd.setCursor(0,1);
+    lcd.setCursor(0, 1);
     lcd.print(String(tasks[taskIndex].name));
 
     digitalWrite(puzzerPin, HIGH);
-
     alarmFired = true;
   }
 
   if (alarmFired) {
-
     if (digitalRead(buttonPin) == HIGH) {
-      
       digitalWrite(puzzerPin, LOW);
       lcd.noBacklight();
-    
       alarmFired = false;
     }
   }
-
-  delay(1000);
 }
+
