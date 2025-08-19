@@ -64,16 +64,13 @@ bool ledState = false;
 void setup() {
   
   Serial.begin(115200);
+
   connectToWiFi();
   server.on("/tasks", handleReceiveTasks);
+  SPIFFS.begin();
   server.begin();
 
-  while (!Serial)
-    continue;
-
-  SPIFFS.begin();
   loadTasks(tasksFile, tasks);
-
 
   lcd.init();
   lcd.backlight();
@@ -235,7 +232,7 @@ void handleReceiveTasks() {
       Serial.printf("Task: %s at %02d:%02d\n", name.c_str(), hour, minute );
       Serial.println(test);
       Serial.println(" ");
-      if(hour == 1){
+      if(test == "LED-toggle"){
         toggleLed();
       }
 
@@ -248,7 +245,9 @@ void handleReceiveTasks() {
 }
 
 void handleTaskJob() {
+
   unsigned long now = millis();
+  
   if (now - lastLcdUpdate < lcdInterval) {
     return; 
   }
@@ -256,7 +255,8 @@ void handleTaskJob() {
 
   struct tm timeinfo;
   getCurrentTime(&timeinfo);
-  printCurrentTime(&timeinfo);
+  
+  // printCurrentTime(&timeinfo);
 
   // Resynchronize with NTP every 30 minutes
   if (now - lastNTPUpdate > ntpSyncInterval) {
