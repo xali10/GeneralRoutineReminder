@@ -17,8 +17,6 @@ const char *password = "Qwertyuio0qwertyuio0";
 // const char *password = ""12031302"";
 // -------------------------------------------
 
-int led = 2 ;
-bool ledState = false;
 
 WebServer server(80); 
 
@@ -50,11 +48,17 @@ const unsigned long ntpSyncInterval = 30 * 60 * 1000; // Sync every 30 minutes (
 // LCD
 LiquidCrystal_I2C lcd(0x27,16,2);
 
+// Pins
+const int ledPin = 2 ; // the number of the LED pin
 const int buttonPin = 4;  // the number of the pushbutton pin
-const int ringPin =  5;    // the number of the puzzer pin
+const int puzzerPin =  5;    // the number of the puzzer pin
+
+// Flags
 bool backlightOn = true;
 bool backlightChanged = false;
 bool alarmFired = false;
+bool ledState = false;
+
 
 void setup() {
   
@@ -79,47 +83,12 @@ void setup() {
 }
 
 void loop() {
-  
-  struct tm timeinfo;
-  getCurrentTime(&timeinfo);
-  
-  // printCurrentTime(&timeinfo);
+    server.handleClient();
 
-  // Resynchronize with NTP every 30 minutes
-  if (millis() - lastNTPUpdate > ntpSyncInterval) {
-    syncTime();
+      for (int i = 0; i < 100; i++) {
+    handleLcd();  
   }
 
-  int taskIndex = checkTimeForTask(&timeinfo);
-
-  if (taskIndex != -1) {
-
-    Serial.println("It's Time To Do Your Job: " + String(tasks[taskIndex].name));
-
-    lcd.backlight();
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print("Task:");
-    lcd.setCursor(0,1);
-    lcd.print(String(tasks[taskIndex].name));
-
-    digitalWrite(ringPin, HIGH);
-
-    alarmFired = true;
-  }
-
-  if (alarmFired) {
-
-    if (digitalRead(buttonPin) == HIGH) {
-      
-      digitalWrite(ringPin, LOW);
-      lcd.noBacklight();
-    
-      alarmFired = false;
-    }
-  }
-
-  delay(1000);
 }
 
 
@@ -232,7 +201,7 @@ void toggleLed() {
 
 void pinInit(){
   pinMode(buttonPin, INPUT);
-  pinMode(ringPin, OUTPUT);
+  pinMode(puzzerPin, OUTPUT);
   pinMode(led, OUTPUT);
 }
 void handleReceiveTasks() {
@@ -269,4 +238,47 @@ void handleReceiveTasks() {
   } else {
     server.send(405, "text/plain", "Method Not Allowed");
   }
+}
+
+void handleLcd(){
+  struct tm timeinfo;
+  getCurrentTime(&timeinfo);
+  
+  // printCurrentTime(&timeinfo);
+
+  // Resynchronize with NTP every 30 minutes
+  if (millis() - lastNTPUpdate > ntpSyncInterval) {
+    syncTime();
+  }
+
+  int taskIndex = checkTimeForTask(&timeinfo);
+
+  if (taskIndex != -1) {
+
+    Serial.println("It's Time To Do Your Job: " + String(tasks[taskIndex].name));
+
+    lcd.backlight();
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Task:");
+    lcd.setCursor(0,1);
+    lcd.print(String(tasks[taskIndex].name));
+
+    digitalWrite(puzzerPin, HIGH);
+
+    alarmFired = true;
+  }
+
+  if (alarmFired) {
+
+    if (digitalRead(buttonPin) == HIGH) {
+      
+      digitalWrite(puzzerPin, LOW);
+      lcd.noBacklight();
+    
+      alarmFired = false;
+    }
+  }
+
+  delay(1000);
 }
