@@ -219,3 +219,11 @@ void connectToWiFi() {
   Serial.println(WiFi.localIP());
 
 }
+
+void toggleLed() {
+  Serial.print(" ledState : ");
+  Serial.println(ledState);
+
+  ledState = !ledState; 
+  digitalWrite(led, ledState ? HIGH : LOW);
+}
