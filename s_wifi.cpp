@@ -1,4 +1,4 @@
-#include "s_wifi_connect.h"
+#include "s_wifi.h"
 
 
 void connectToWiFi(const char* ssid, const char* password) {

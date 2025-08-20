@@ -1,5 +1,5 @@
-#ifndef S_WIFI_CONNECT_H
-#define S_WIFI_CONNECT_H
+#ifndef S_WIFI_H
+#define S_WIFI_H
 
 #include <Arduino.h>
 #include <WiFi.h>

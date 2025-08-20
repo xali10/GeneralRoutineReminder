@@ -83,10 +83,7 @@ void loop() {
 
   server.handleClient();
 
-  for (int i = 0; i < 100; i++) {
-    handleTaskJob();
-  }
-
+  handleTaskJob();
 }
 
 
