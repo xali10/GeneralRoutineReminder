@@ -5,15 +5,15 @@
 #include "SPIFFS.h"
 #include <time.h>
 #include <LiquidCrystal_I2C.h>
-#include <WebServer.h>  //<-- new
+#include <WebServer.h>  
 
 
 #define TASKS_CAP 20
 
 
 // ---------------------WiFi------------------
-//const char *ssid = ">_";
-//const char *password = "Qwertyuio0qwertyuio0";
+// const char *ssid = ">_";
+// const char *password = "Qwertyuio0qwertyuio0";
 
 const char *ssid = "WE_F92510";
 const char *password = "12031302";
@@ -33,10 +33,6 @@ struct Task {
 };
 
 
-// Wifi credintials
-// const char* configFile = "/Dexconfig.json";// "/config.json"
-// Config config;
-
 // Tasks
 const char* tasksFile = "/tasks.json";
 Task tasks[TASKS_CAP];
@@ -48,8 +44,7 @@ unsigned long lastNTPUpdate = 0;          // Timestamp for the last NTP sync
 const unsigned long ntpSyncInterval = 30 * 60 * 1000; // Sync every 30 minutes (in ms)
 unsigned long lastLcdUpdate = 0;          // Timestamp for the last LCD update
 const unsigned long lcdInterval = 1000;   // Update every second (in ms)
-// LCD
-LiquidCrystal_I2C lcd(0x27,16,2);
+
 
 // Pins
 const int ledPin = 2 ;      // the number of the LED pin
@@ -234,7 +229,7 @@ void handleTaskJob() {
   
   struct tm timeinfo;
   getCurrentTime(&timeinfo);
-  //  printCurrentTime(&timeinfo);
+  //  printCurrentTime(&timeinfo);  // <-- for testing
 
   // Resynchronize with NTP every 30 minutes
   if (now - lastNTPUpdate > ntpSyncInterval) {
