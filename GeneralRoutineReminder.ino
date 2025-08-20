@@ -258,6 +258,14 @@ void handleTaskJob() {
   }
 }
 
+void puzzerTone(){
+  for (int i = 0; i < 3; i++) {
+    togglePuzzer();
+    delay(100);
+    togglePuzzer();
+    delay(100);
+  }
+}
 
 void togglePuzzer() {
   Serial.print(" puzzerState : ");
