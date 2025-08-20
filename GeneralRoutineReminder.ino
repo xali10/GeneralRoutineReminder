@@ -56,6 +56,7 @@ bool backlightOn = true;       // Backlight state
 bool backlightChanged = false; // Backlight state changed
 bool alarmFired = false;       // Alarm state
 bool ledState = false;         // LED state
+bool puzzerState = false;         // puzzer state
 
 
 void setup() {
@@ -255,5 +256,14 @@ void handleTaskJob() {
       alarmFired = false;
     }
   }
+}
+
+
+void togglePuzzer() {
+  Serial.print(" puzzerState : ");
+  Serial.println(puzzerState);
+
+  puzzerState = !puzzerState;
+  digitalWrite(puzzerPin, puzzerState ? HIGH : LOW);
 }
 
