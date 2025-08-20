@@ -4,18 +4,19 @@
 #include <ArduinoJson.h>
 #include "SPIFFS.h"
 #include <time.h>
-#include <WebServer.h>
+#include <LiquidCrystal_I2C.h>
+#include <WebServer.h>  
 
 
 #define TASKS_CAP 20
 
 
 // ---------------------WiFi------------------
-//const char *ssid = ">_";
-//const char *password = "Qwertyuio0qwertyuio0";
+const char *ssid = ">_";
+const char *password = "Qwertyuio0qwertyuio0";
 
-const char *ssid = "WE_F92510";
-const char *password = "12031302";
+// const char *ssid = "WE_F92510";
+// const char *password = "12031302";
 // -------------------------------------------
 
 
@@ -32,10 +33,6 @@ struct Task {
 };
 
 
-// Wifi credintials
-// const char* configFile = "/Dexconfig.json";// "/config.json"
-// Config config;
-
 // Tasks
 const char* tasksFile = "/tasks.json";
 Task tasks[TASKS_CAP];
@@ -45,8 +42,9 @@ bool tasksFired[TASKS_CAP] = {0};
 const char* timezone = "EET-2EEST,M4.5.5/0,M10.5.4/24"; // Eastern Egypt Time
 unsigned long lastNTPUpdate = 0; // Timestamp for the last NTP sync
 const unsigned long ntpSyncInterval = 30 * 60 * 1000; // Sync every 30 minutes (in ms)
-//unsigned long lastLcdUpdate = 0;   // Timestamp for the last LCD update
-//const unsigned long lcdInterval = 1000; // Update every second (in ms)
+unsigned long lastLcdUpdate = 0;   // Timestamp for the last LCD update
+const unsigned long lcdInterval = 1000; // Update every second (in ms)
+
 
 // Pins
 const int ledPin = 2 ;      // the number of the LED pin
@@ -54,10 +52,10 @@ const int buttonPin = 4;    // the number of the pushbutton pin
 const int puzzerPin =  5;   // the number of the puzzer pin
 
 // Flags
-bool backlightOn = true;
-bool backlightChanged = false;
-bool alarmFired = false;
-bool ledState = false;
+bool backlightOn = true;  // Backlight state
+bool backlightChanged = false; // Backlight state changed
+bool alarmFired = false;  // Alarm state
+bool ledState = false;    // LED state
 
 
 void setup() {
@@ -66,6 +64,8 @@ void setup() {
   connectToWiFi(ssid, password);
   server.on("/tasks", handleReceiveTasks);
   server.begin();
+  lcd.init();
+
 
   while (!Serial)
     continue;
@@ -185,11 +185,7 @@ void toggleLed() {
   digitalWrite(ledPin, ledState ? HIGH : LOW);
 }
 
-void pinInit() {
-  pinMode(buttonPin, INPUT);
-  pinMode(puzzerPin, OUTPUT);
-  pinMode(ledPin, OUTPUT);
-}
+
 void handleReceiveTasks() {
 
   if (server.method() == HTTP_POST) {
@@ -225,6 +221,13 @@ void handleReceiveTasks() {
     server.send(405, "text/plain", "Method Not Allowed");
   }
 }
+void pinInit(){
+
+  pinMode(buttonPin, INPUT);
+  pinMode(puzzerPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+  
+}
 
 void handleTaskJob() {
   unsigned long now = millis();
@@ -258,3 +261,4 @@ void handleTaskJob() {
     }
   }
 }
+
