@@ -213,7 +213,7 @@ void handleReceiveTasks() {
       Serial.printf("Task: %s at %02d:%02d\n", name.c_str(), hour, minute );
       Serial.println(test);
       Serial.println(" ");
-      if (hour == 1) {
+      if (test == "LED-toggle" ){
         toggleLed();
       }
 
