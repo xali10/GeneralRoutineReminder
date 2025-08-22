@@ -3,6 +3,7 @@
 Speaker::Speaker(byte pin) {
 
   this->pin = pin;
+  init();
 }
 
 
@@ -28,18 +29,37 @@ void Speaker::loop() {
 
   if (!isPlaying)
     return;
-    
-  int size = sizeof(durations) / sizeof(int);
 
-  for (int note = 0; note < size; note++) {
+    digitalWrite(pin, HIGH);
+  delay(30);
+  digitalWrite(pin, LOW);
+  delay(30);
+  digitalWrite(pin, HIGH);
+  delay(30);
+  digitalWrite(pin, LOW);
+  delay(30);
+  digitalWrite(pin, HIGH);
+  delay(30);
+  digitalWrite(pin, LOW);
+  delay(30);
+  digitalWrite(pin, HIGH);
+  delay(30);
+  digitalWrite(pin, LOW);
+  delay(30);
     
-    int duration = 1000 / durations[note];
-    tone(pin, melody[note], duration);
+//  int size = sizeof(durations) / sizeof(int);
 
-    int pauseBetweenNotes = duration * 1.30;
-    delay(pauseBetweenNotes);
+//  for (int note = 0; note < size; note++) {
+    
+//    int duration = 1000 / durations[note];
+//    tone(pin, melody[note], duration);
+
+//    int pauseBetweenNotes = duration * 1.30;
+//    delay(pauseBetweenNotes);
     
     //stop the tone playing:
-    noTone(pin);
-  }
+//    noTone(pin);
+//  }
+  
+  
 }

@@ -25,5 +25,6 @@ void Led::off() {
 
 void Led::toggle() {
 
-  digitalWrite(pin, digitalRead(pin) ? HIGH : LOW);
+  digitalWrite(pin, (state? HIGH : LOW));
+  state = !state;
 }

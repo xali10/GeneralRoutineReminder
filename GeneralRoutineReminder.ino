@@ -1,123 +1,93 @@
-#include "s_wifi.h"
-#include "s_lcd.h"
+// 2 (00) , 4 (45min) tasks not ringing
 
-#include <ArduinoJson.h>
-#include "SPIFFS.h"
+#include "s_wifi.h"
+
+#include "Led.h"
+#include "Button.h"
+#include "Display.h"
+#include "Speaker.h"
+#include "AppData.h"
+
+
 #include <time.h>
-#include <LiquidCrystal_I2C.h>
-#include <WebServer.h>  
+#include <WebServer.h>
 
 
 #define TASKS_CAP 20
+#define LED_PIN 2
+#define BUTTON_PIN 4
+#define BUZZER_PIN 5
+
+const char* tasksFile = "/tasks.json";
 
 
 // ---------------------WiFi------------------
-// const char *ssid = ">_";
-// const char *password = "Qwertyuio0qwertyuio0";
+//const char *ssid = ">_";
+//const char *password = "Qwertyuio0qwertyuio0";
 
 const char *ssid = "WE_F92510";
 const char *password = "12031302";
 // -------------------------------------------
 
 
+Led testLed(LED_PIN);
+Button modeButton(BUTTON_PIN);
+Display display(0x27, 16, 2);
+Speaker speaker(BUZZER_PIN);
+AppData appData;
+
+std::vector<Task> tasks;
+bool tasksFired[20] = {0};
+
+
 WebServer server(80);
 
-struct Time {
-  int hour;
-  int minute;
-};
-
-struct Task {
-  char name[64];
-  Time time;
-};
-
-
-// Tasks
-const char* tasksFile = "/tasks.json";
-Task tasks[TASKS_CAP];
-bool tasksFired[TASKS_CAP] = {0};
+// Wifi credintials
+// const char* configFile = "/Dexconfig.json";// "/config.json"
+// Config config;
 
 // Time
 const char* timezone = "EET-2EEST,M4.5.5/0,M10.5.4/24"; // Eastern Egypt Time
-unsigned long lastNTPUpdate = 0;          // Timestamp for the last NTP sync
+unsigned long lastNTPUpdate = 0; // Timestamp for the last NTP sync
 const unsigned long ntpSyncInterval = 30 * 60 * 1000; // Sync every 30 minutes (in ms)
-unsigned long lastLcdUpdate = 0;          // Timestamp for the last LCD update
-const unsigned long lcdInterval = 1000;   // Update every second (in ms)
-
-
-// Pins
-const int ledPin = 2 ;      // the number of the LED pin
-const int buttonPin = 4;    // the number of the pushbutton pin
-const int puzzerPin =  5;   // the number of the puzzer pin
 
 // Flags
-bool backlightOn = true;       // Backlight state
-bool backlightChanged = false; // Backlight state changed
-bool alarmFired = false;       // Alarm state
-bool ledState = false;         // LED state
-bool puzzerState = false;         // puzzer state
+bool backlightOn = true;
+bool backlightChanged = false;
+bool alarmFired = false;
 
+void handleReceiveTasks();
+void syncTime();
 
 void setup() {
 
   Serial.begin(115200);
-  connectToWiFi(ssid, password);
-  server.on("/tasks", handleReceiveTasks);
-  server.begin();
-
   while (!Serial)
     continue;
 
-  SPIFFS.begin();
-  loadTasks(tasksFile, tasks);
+  appData.init();
 
-  lcd_init(false);
+  display.init(); display.off();
+
+  appData.loadTasks(tasksFile, tasks);
+
+  connectToWiFi(ssid, password);
+
+  server.on("/tasks", handleReceiveTasks);
+  server.begin();
 
   syncTime();
-  pinInit();
+
+
 }
 
 void loop() {
 
+  modeButton.update();
+  speaker.loop();
   server.handleClient();
 
   handleTaskJob();
-}
-
-
-
-// Load tasks from file
-void loadTasks(const char* filename, Task tasks[]) {
-
-  File file = SPIFFS.open(filename);
-
-  StaticJsonDocument<512> doc;
-  DeserializationError error = deserializeJson(doc, file);
-  if (error) {
-    Serial.print("deserializeJson() failed: ");
-    Serial.println(error.c_str());
-    return;
-  }
-
-  int i = 0;
-  for (JsonObject item : doc.as<JsonArray>()) {
-
-    Task task;
-    strcpy(task.name, item["name"]);
-    Time time;
-    time.hour = item["time"]["hour"];
-    time.minute = item["time"]["minute"];
-    task.time = time;
-
-    tasks[i] = task;
-
-    Serial.println("name: " + String(task.name) + ", hour:" + String(time.hour));
-
-    i++;
-  }
-
-  file.close();
 }
 
 
@@ -142,12 +112,9 @@ void printCurrentTime(struct tm *_timeinfo) {
 
 int checkTimeForTask(struct tm *_timeinfo) {
 
-  for (int i = 0; i < TASKS_CAP; i++) {
+  for (int i = 0; i < tasks.size(); i++) {
 
-    Task task = tasks[i];
-    Time time = tasks[i].time;
-
-    if (_timeinfo->tm_hour == time.hour && _timeinfo->tm_min == time.minute && !tasksFired[i]) {
+    if (_timeinfo->tm_hour == tasks.at(i).getHour() && _timeinfo->tm_min == tasks.at(i).getMinute() && !tasksFired[i]) {
 
       tasksFired[i] = true;
 
@@ -176,19 +143,6 @@ void syncTime() {
 }
 
 
-void toggleLed() {
-  Serial.print(" ledState : ");
-  Serial.println(ledState);
-
-  ledState = !ledState;
-  digitalWrite(ledPin, ledState ? HIGH : LOW);
-}
-
-void pinInit(){
-  pinMode(buttonPin, INPUT);
-  pinMode(puzzerPin, OUTPUT);
-  pinMode(ledPin, OUTPUT);
-}
 void handleReceiveTasks() {
 
   if (server.method() == HTTP_POST) {
@@ -213,10 +167,10 @@ void handleReceiveTasks() {
       Serial.printf("Task: %s at %02d:%02d\n", name.c_str(), hour, minute );
       Serial.println(test);
       Serial.println(" ");
-      if (test == "LED-toggle" ){
-        toggleLed();
+      if (test == "LED-toggle") {
+        testLed.toggle();
+        Serial.println(">>>>>toggled successfully>>>>>>");
       }
-
     }
 
     server.send(200, "text/plain", "Tasks received");
@@ -227,10 +181,9 @@ void handleReceiveTasks() {
 
 void handleTaskJob() {
   unsigned long now = millis();
-  
+
   struct tm timeinfo;
   getCurrentTime(&timeinfo);
-  //  printCurrentTime(&timeinfo);  // <-- for testing
 
   // Resynchronize with NTP every 30 minutes
   if (now - lastNTPUpdate > ntpSyncInterval) {
@@ -240,38 +193,22 @@ void handleTaskJob() {
   int taskIndex = checkTimeForTask(&timeinfo);
 
   if (taskIndex != -1) {
-    Serial.println("It's Time To Do Your Job: " + String(tasks[taskIndex].name));
+    Serial.println("It's Time To Do Your Job: " + tasks.at(taskIndex).getName());
 
-    lcd_print("Task:", 0, 0);
-    lcd_append(String(tasks[taskIndex].name), 0, 1);
+    display.on();
+    display.print("Task:", 0, 0);
+    display.print(tasks.at(taskIndex).getName(), 0, 1);
 
-    digitalWrite(puzzerPin, HIGH);
+    speaker.play();
     alarmFired = true;
   }
 
-  if (alarmFired) {
-    if (digitalRead(buttonPin) == HIGH) {
-      digitalWrite(puzzerPin, LOW);
-      lcd_turnOff();
-      alarmFired = false;
-    }
+  if (alarmFired && modeButton.isPressed()) {
+
+    Serial.println("Button Pressed!");
+    speaker.stop();
+    display.off();
+    display.clear();
+    alarmFired = false;
   }
 }
-
-void puzzerTone(){
-  for (int i = 0; i < 3; i++) {
-    togglePuzzer();
-    delay(100);
-    togglePuzzer();
-    delay(100);
-  }
-}
-
-void togglePuzzer() {
-  Serial.print(" puzzerState : ");
-  Serial.println(puzzerState);
-
-  puzzerState = !puzzerState;
-  digitalWrite(puzzerPin, puzzerState ? HIGH : LOW);
-}
-
