@@ -1,7 +1,3 @@
-// 2 (00) , 4 (45min) tasks not ringing
-
-#include "s_wifi.h"
-
 #include "AppData.h"
 #include "AppController.h"
 #include "Display.h"
@@ -42,10 +38,9 @@ void setup() {
   appData.init();
   display.init(0x27, 16, 2);
   display.off();
-
   
 
-  connectToWiFi(ssid, password);
+  controller.connectToWifi(ssid, password);
 
   appData.loadTasks(tasksFile, tasks);
   controller.init(display);

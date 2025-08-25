@@ -117,3 +117,9 @@ void AppController::setTasks(std::vector<Task> tasks) {
 void AppController::toggleLed() {
   testLed.toggle();
 }
+
+
+void AppController::connectToWifi(const char* ssid, const char* password) {
+
+  wifiManager.connect(ssid, password);
+}

@@ -14,6 +14,7 @@
 #include "Speaker.h"
 #include "Task.h"
 #include "Display.h"
+#include "WifiManager.h"
 
 
 class AppController {
@@ -28,6 +29,7 @@ class AppController {
     Button modeButton;
     Speaker speaker;
     Display display;
+    WifiManager wifiManager;
     
 
     std::vector<Task> tasks;
@@ -47,6 +49,7 @@ class AppController {
     void update();
     void setTasks(std::vector<Task> tasks);
     void toggleLed();
+    void connectToWifi(const char* ssid, const char* password);
 };
 
 #endif
