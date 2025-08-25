@@ -1,16 +1,15 @@
 #include "Display.h"
 
 
-Display::Display(byte address, byte cols, byte rows) {
+Display::Display() {
   
-  this->address = address;
-  this->cols = cols;
-  this->rows = rows;
 }
 
 
-void Display::init() {
-
+void Display::init(byte address, byte cols, byte rows) {
+  this->address = address;
+  this->cols = cols;
+  this->rows = rows;
   this->lcd = new LiquidCrystal_I2C(address, cols, rows);
   
   lcd->begin();

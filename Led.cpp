@@ -1,13 +1,11 @@
 #include "Led.h"
 
-Led::Led(byte pin) {
+Led::Led() {
 
-  this->pin = pin;
-  init();
 }
 
-void Led::init() {
-
+void Led::init(byte pin) {
+  this->pin = pin;
   pinMode(pin, OUTPUT);
 
   off();

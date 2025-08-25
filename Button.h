@@ -13,9 +13,9 @@ class Button {
     unsigned long debounceDelay = 50;
     
   public:
-    Button(byte pin);
+    Button();
 
-    void init();
+    void init(byte pin);
     void update();
 
     byte getState();

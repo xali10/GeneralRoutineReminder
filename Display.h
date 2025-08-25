@@ -12,8 +12,8 @@ class Display {
   LiquidCrystal_I2C* lcd;
 
   public:
-  Display(byte address, byte cols, byte rows);
-  void init();
+  Display();
+  void init(byte address, byte cols, byte rows);
   void on();
   void off();
   void print(String s, byte x, byte y);

@@ -1,14 +1,12 @@
 #include "Speaker.h"
 
-Speaker::Speaker(byte pin) {
+Speaker::Speaker() {
 
-  this->pin = pin;
-  init();
 }
 
 
-void Speaker::init() {
-
+void Speaker::init(byte pin) {
+  this->pin = pin;
   pinMode(pin, OUTPUT);
 }
 

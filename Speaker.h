@@ -20,8 +20,8 @@ class Speaker {
 //    };
 
   public:
-    Speaker(byte pin);
-    void init();
+    Speaker();
+    void init(byte pin);
     void play();
     void stop();
     void loop();

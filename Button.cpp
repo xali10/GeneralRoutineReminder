@@ -1,12 +1,13 @@
 #include "Button.h"
 
-Button::Button(byte pin) {
-  this->pin = pin;
-  lastReading = LOW;
-  init();
+Button::Button() {
+  
 }
 
-void Button::init() {
+void Button::init(byte pin) {
+  
+  this->pin = pin;
+  lastReading = LOW;
   pinMode(pin, INPUT);
   update();
 }

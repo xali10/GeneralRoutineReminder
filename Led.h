@@ -10,8 +10,8 @@ class Led {
     bool state;
 
   public:
-    Led(byte pin);
-    void init();
+    Led();
+    void init(byte pin);
     void on();
     void off();
     void toggle();
