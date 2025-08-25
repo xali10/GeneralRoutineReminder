@@ -1,6 +1,7 @@
 #include "AppData.h"
 #include "AppController.h"
 #include "Display.h"
+#include "Speaker.h"
 
 
 #include <WebServer.h>
@@ -83,10 +84,16 @@ void handleReceiveTasks() {
       Serial.printf("Task: %s at %02d:%02d\n", name.c_str(), hour, minute );
       Serial.println(test);
       Serial.println(" ");
+
       if (test == "LED-toggle") {
         controller.toggleLed();
         Serial.println(">>>>>toggled successfully>>>>>>");
       }
+      if (test == "puzzer-toggle") {
+        Speaker().loop();
+        Serial.println(">>>>>puzzer test successfully>>>>>>");
+      }
+      
     }
 
     server.send(200, "text/plain", "Tasks received");
