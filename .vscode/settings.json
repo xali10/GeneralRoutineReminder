@@ -1,7 +1,0 @@
-{
-  "files.associations": {
-    "*.yuck": "yaml",
-    "ostream": "cpp",
-    "print": "cpp"
-  }
-}
