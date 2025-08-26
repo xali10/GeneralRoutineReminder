@@ -73,36 +73,36 @@
   {
     "name": "Task 1",
     "time" : {
-    	"hour" : 20,
-    	"minute" :23
+    	"hour" : 23,
+    	"minute" :4
     }
   },
   {
     "name": "Task 2",
     "time" : {
-    	"hour" : 20,
-    	"minute" : 24
+    	"hour" : 23,
+    	"minute" : 5
     }
   },
   {
     "name": "Task 3",
     "time" : {
-    	"hour" : 20,
-    	"minute" : 30
+    	"hour" : 0,
+    	"minute" : 0
     }
   },
   {
     "name": "Task 4",
     "time" : {
-    	"hour" : 20,
-    	"minute" : 45
+    	"hour" : 0,
+    	"minute" : 5
     }
   },
   {
     "name": "Task 5",
     "time" : {
-    	"hour" : 21,
-    	"minute" : 00
+    	"hour" : 3,
+    	"minute" : 52
     }
   }
 ]

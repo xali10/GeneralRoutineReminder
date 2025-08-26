@@ -1,0 +1,56 @@
+#ifndef APP_CONTROLLER_H
+#define APP_CONTROLLER_H
+
+#define TASKS_CAP 20
+#define LED_PIN 2
+#define BUTTON_PIN 4
+#define BUZZER_PIN 5
+
+#include <Arduino.h>
+#include <time.h>
+#include <vector>
+#include "Led.h"
+#include "Button.h"
+#include "Buzzer.h"
+#include "Task.h"
+#include "Display.h"
+#include "WifiManager.h"
+
+
+class AppController {
+
+  private:
+    // Time
+    const char* timezone = "EET-2EEST,M4.5.5/0,M10.5.4/24"; // Eastern Egypt Time
+    unsigned long lastNTPUpdate = 0; // Timestamp for the last NTP sync
+    const unsigned long ntpSyncInterval = 30 * 60 * 1000; // Sync every 30 minutes (in ms)
+    bool alarmFired = false;
+    Led testLed;
+    Button modeButton;
+    Buzzer buzzer;
+    Display display;
+    WifiManager wifiManager;
+    
+
+    std::vector<Task> tasks;
+    bool tasksFired[20] = {0};
+
+    
+    void syncTime();
+    void getCurrentTime(struct tm *_timeinfo);
+    void printCurrentTime(struct tm *_timeinfo);
+    int checkTimeForTask(struct tm *_timeinfo);
+    void handleTaskJob();
+
+  public:
+    AppController();
+
+    void init(Display display);
+    void update();
+    void setTasks(std::vector<Task> tasks);
+    void toggleLed();
+    void toggleBuzzer();
+    void connectToWifi(const char* ssid, const char* password);
+};
+
+#endif
